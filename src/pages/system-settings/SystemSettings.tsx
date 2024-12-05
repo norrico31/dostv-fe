@@ -6,24 +6,8 @@ const navLinks = [
         children: 'Statuses'
     },
     {
-        path: 'schedules',
-        children: 'Schedules'
-    },
-    {
-        path: 'project-types',
-        children: 'Project types'
-    },
-    {
-        path: 'severity-types',
-        children: 'Severity types'
-    },
-    {
-        path: 'issue-types',
-        children: 'Issue types'
-    },
-    {
-        path: 'devices',
-        children: 'Devices'
+        path: 'Priorities',
+        children: 'priority'
     },
     {
         path: 'roles',

@@ -109,7 +109,7 @@ const initState: DaoFE<Status[]> = {
 
 export default function Statuses() {
     const [loading, setLoading] = useState(true)
-    const [{ data, ...pageProps }, setData] = useState<DaoFE<Status[]>>(initState)
+    const [data, setData] = useState<DaoFE<Status[]>>(initState)
     const [search, inputValue, onChange] = useSearchDebounce()
     const [openModal, setOpenModal] = useState(false)
     const [selectedData, setSelectedData] = useState<Status | undefined>(undefined)
@@ -129,7 +129,8 @@ export default function Statuses() {
         setLoading(true)
         try {
             const res = await getStatuses({ signal: args?.signal, search: args?.search, page: args?.page });
-            setData(res)
+            const {data} = await res.json()
+            setData(data)
         } catch (error) {
             console.log('error: ', error)
             return error
@@ -157,7 +158,6 @@ export default function Statuses() {
         setOpenModal(false)
         setOpenDeleteModal(false)
     }
-
     return (
         <>
             <div className="flex justify-between items-center mb-2 flex-wrap">
@@ -186,7 +186,7 @@ export default function Statuses() {
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? <tr><td className='w-full h-full'><Loading /></td></tr> : !data.length ? <tr className='text-center'><td className='w-full h-full'>No data record </td></tr> : (data ?? []).map((d) => (
+                        {loading ? <tr><td className='w-full h-full'><Loading /></td></tr> : !data?.length ? <tr className='text-center'><td className='w-full h-full'>No data record </td></tr> : data?.map((d) => (
                             <tr className="white dark:bg-gray-900/50 hover:bg-gray-100/50 dark:hover:bg-gray-900" key={d.id}>
                                 <td className="px-6 py-4 border border-slate-300 dark:border-slate-700 p-4 text-slate-500 dark:text-white">
                                     {d.name}
@@ -200,11 +200,11 @@ export default function Statuses() {
                         }
                     </tbody>
                 </Table>
-                <Pagination
+                {/* <Pagination
                     {...pageProps}
                     onNextClick={() => getData({ page: +pageProps?.page + 1, search })}
                     onPrevClick={() => getData({ page: +pageProps?.page - 1, search })}
-                />
+                /> */}
             </div>
             <Modal
                 open={openModal}

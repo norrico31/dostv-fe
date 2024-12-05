@@ -150,6 +150,7 @@ type User = {
     email: string
     firstName: string
     id: number
+    password: string
     roleId: number
     role: Role
     lastActiveAt: string | null

@@ -1,33 +1,17 @@
 import { BASE_URL } from "../config";
-import { transformBeToFe } from "../utils/transformer";
-import { urlParams } from "../utils/url-params";
 
 export const userDao = () => {
-    const loginUser = async (user: { email: string; password: string }): Promise<{ token: string }> => {
-        return await fetch<{ token: string }>(urlParams(`/users/login`), { method: 'POST', body: JSON.stringify(user) })
-    }
+    const loginUser = (user: { email: string; password: string }) => fetch(`${BASE_URL}/login`, { method: 'POST', body: JSON.stringify(user) })
 
-    const getUsers = async ({ signal, ...restparams }: ApiParams): Promise<DaoFE<User[]>> => {
-        const res = await fetch<DaoBE<User[]>>(urlParams(`/users`, { ...restparams }), { signal })
-        return transformBeToFe<User[]>(res)
-    }
-    // TODO
-    const getMe = async (id: number, signal: AbortSignal): Promise<User> => fetch(`${BASE_URL}/user/${id}`, { signal })
+    const getUsers = ({ signal, ...restparams }: ApiParams) => fetch(`${BASE_URL}/users`, { ...restparams, signal })
 
-    const postUser = async (payload: User) => {
-        const { data } = await fetch<UserDao>(urlParams(`/users/`), { method: 'POST', body: JSON.stringify(payload) })
-        return data
-    }
+    const getMe = (id: number, signal: AbortSignal) => fetch(`${BASE_URL}/users/` + id, { signal })
 
-    const putUser = async ({ id, ...restPayload }: User) => {
-        const { data } = await fetch<UserDao>(urlParams(`/users/` + id), { method: 'PUT', body: JSON.stringify(restPayload) })
-        return data
-    }
+    const postUser = (payload: User) => fetch(`${BASE_URL}/users`, { body: JSON.stringify(payload), method: 'POST' })
 
-    const deleteUser = async (id: string) => {
-        const { data } = await fetch<UserDao>(urlParams(`/users/` + id), { method: 'DELETE' })
-        return data
-    }
+    const putUser = ({ id, ...restPayload }: User) => fetch(`${BASE_URL}/users/` + id, { body: JSON.stringify(restPayload), method: "PUT" })
+
+    const deleteUser = (id: string) => fetch(`${BASE_URL}/users/` + id, { method: "DELETE" })
 
     return {
         loginUser,

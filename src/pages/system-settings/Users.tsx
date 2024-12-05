@@ -9,7 +9,7 @@ import { useToastNotificationCtx } from '../../shared/contexts/ToastNotification
 const { getUsers, postUser, putUser, deleteUser } = userDao()
 const { getRoles } = roleDao()
 
-const initInputState: User = { first_name: '', last_name: '', role: '', role_id: '', middle_name: '', age: '', email: '', phone_no: '', password: '', status: 'ACTIVE' }
+const initInputState: User = { firstName: '', lastName: '', role: '', roleId: '', middle_name: '', age: '', email: '', password: '' }
 
 type Props = {
     open: boolean;
@@ -26,8 +26,9 @@ function SelectRole({ value, onChange }: { value: string; onChange: (v: string) 
         const controller = new AbortController();
         setLoading(true);
         (async () => {
-            const { data } = await getRoles({ signal: controller.signal, all: true }).finally(() => setLoading(false))
-            setData(data ?? [])
+            const res = await getRoles({ signal: controller.signal, all: true }).finally(() => setLoading(false))
+            const data = await res.json()
+            setData(data?.data ?? [])
         })();
         return () => {
             controller.abort()
@@ -111,10 +112,9 @@ function Modal({ open, onClose, selectedData, getData }: Props) {
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setLoading(true)
-        console.log(fields)
         const id = selectedData ? selectedData.id : ''
         try {
-            const res = id ? putUser({ ...fields }) : postUser(fields)
+            const res = id ? putUser({ ...fields, age: Number(fields?.age) }) : postUser({ ...fields, age: Number(fields?.age) })
             await res
             setInfo({
                 status: id ? 'warning' : 'success',
@@ -152,31 +152,20 @@ function Modal({ open, onClose, selectedData, getData }: Props) {
                                     <label htmlFor="email" className="peer-focus:font-medium absolute text-md  text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Email</label>
                                 </div>
                                 <div className="relative  w-full mb-5 group">
-                                    <SelectRole value={fields.role_id} onChange={(v) => setFields({ ...fields, role_id: v })} />
+                                    <SelectRole value={fields.roleId} onChange={(v) => setFields({ ...fields, roleId: v })} />
                                 </div>
                             </div>
                             <div className="grid md:grid-cols-2 md:gap-6">
                                 <div className="relative  w-full mb-5 group">
-                                    <input type="text" value={fields.first_name} onChange={e => setFields({ ...fields, first_name: e.target.value })} name="floating_first_name" id="floating_first_name" className="block py-2.5 px-0 w-full text-md text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
+                                    <input type="text" value={fields.firstName} onChange={e => setFields({ ...fields, firstName: e.target.value })} name="floating_first_name" id="floating_first_name" className="block py-2.5 px-0 w-full text-md text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
                                     <label htmlFor="floating_first_name" className="peer-focus:font-medium absolute text-md text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">First name</label>
                                 </div>
                                 <div className="relative  w-full mb-5 group">
-                                    <input type="text" name="floating_last_name" value={fields.last_name} onChange={e => setFields({ ...fields, last_name: e.target.value })} id="floating_last_name" className="block py-2.5 px-0 w-full text-md text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
+                                    <input type="text" name="floating_last_name" value={fields.lastName} onChange={e => setFields({ ...fields, lastName: e.target.value })} id="floating_last_name" className="block py-2.5 px-0 w-full text-md text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
                                     <label htmlFor="floating_last_name" className="peer-focus:font-medium absolute text-md text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Last name</label>
                                 </div>
                             </div>
                             <div className="grid md:grid-cols-2 md:gap-6">
-                                <div className="relative  w-full mb-5 group">
-                                    <input
-                                        type="text"
-                                        name="middle_name"
-                                        id="middle_name"
-                                        value={fields.middle_name}
-                                        onChange={e => setFields({ ...fields, middle_name: e.target.value })}
-                                        className="block py-2.5 px-0 w-full text-md text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" "
-                                    />
-                                    <label htmlFor="middle_name" className="peer-focus:font-medium absolute text-md text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Middle Name</label>
-                                </div>
                                 <div className="relative z-0 w-full mb-5 group">
                                     <input
                                         type="text"
@@ -190,14 +179,9 @@ function Modal({ open, onClose, selectedData, getData }: Props) {
                                 </div>
                             </div>
                             <div className="grid md:grid-cols-2 md:gap-6">
-                                <div className="relative z-0 w-full mb-5 group">
-                                    {/* TODO: FORMAT FOR 639 || 09 */}
-                                    <input type="text" name="phone_no" pattern="09\d{9}" id="phone_no" value={fields.phone_no} onChange={e => setFields({ ...fields, phone_no: e.target.value })} className="block py-2.5 px-0 w-full text-md text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
-                                    <label htmlFor="phone_no" className="peer-focus:font-medium absolute text-md text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Phone number (PH#)</label>
-                                </div>
-                                <div className="relative z-0 w-full mb-5 group">
-                                    <SelectStatus value={fields.status} onChange={(v) => setFields({ ...fields, status: v })} />
-                                </div>
+                                {/* <div className="relative z-0 w-full mb-5 group">
+                                    <SelectStatus value={fields.statusId} onChange={(v) => setFields({ ...fields, status: v })} />
+                                </div> */}
                             </div>
                             <div className="relative z-0 w-full mb-5 group">
                                 <input
@@ -235,16 +219,9 @@ function Modal({ open, onClose, selectedData, getData }: Props) {
     </Dialog>
 }
 
-const initState: DaoFE<User[]> = {
-    data: [],
-    page: 1,
-    lastPage: 1,
-    totalItems: 0
-}
-
 export default function Users() {
     const [loading, setLoading] = useState(true)
-    const [{ data, ...pageProps }, setData] = useState<DaoFE<User[]>>(initState)
+    const [data, setData] = useState<User[]>([])
     const [search, inputValue, onChange] = useSearchDebounce()
     const [openModal, setOpenModal] = useState(false)
     const [selectedData, setSelectedData] = useState<User | undefined>(undefined)
@@ -253,19 +230,19 @@ export default function Users() {
     useEffect(() => {
         const controller = new AbortController();
         let flag = false;
-        !flag && getData({ signal: controller.signal, search })
+        if (!flag) getData({ signal: controller.signal, search })
         return function () {
             controller.abort()
             flag = true
         }
     }, [search])
 
-    async function getData(args?: ApiParams): Promise<User[]> {
+    async function getData(args?: ApiParams) {
         setLoading(true)
         try {
             const res = await getUsers({ signal: args?.signal, search: args?.search, page: args?.page });
-            setData(res)
-            return res.data satisfies User[]
+            const data = await res.json()
+            setData(data.data ?? [])
         } catch (error) {
             console.log('error: ', error)
             throw error
@@ -311,12 +288,6 @@ export default function Users() {
                 <Table>
                     <thead className="text-md text-gray-800 uppercase bg-gray-200 dark:bg-gray-700 dark:text-gray-100">
                         <tr>
-                            {/* <th scope="col" className="p-4">
-                                <div className="flex items-center">
-                                    <input id="checkbox-all-search" type="checkbox" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-                                    <label htmlFor="checkbox-all-search" className="sr-only">checkbox</label>
-                                </div>
-                            </th> */}
                             <th scope="col" className="px-6 py-3">
                                 Name
                             </th>
@@ -326,46 +297,33 @@ export default function Users() {
                             <th scope="col" className="px-6 py-3">
                                 Role
                             </th>
-                            <th scope="col" className="px-6 py-3">
-                                Phone #
-                            </th>
                             <th scope="col" className="px-6 py-3 text-center">
                                 Action
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? <tr><td className='w-full h-full'><Loading /></td></tr> : !data.length ? <tr className='text-center'><td className='w-full h-full'>No data record </td></tr> : (data ?? []).map((d) => (
+                        {loading ? <tr><td className='w-full h-full'><Loading /></td></tr> : !data?.length ? <tr className='text-center'><td className='w-full h-full'>No data record </td></tr> : (data ?? []).map((d) => (
                             <tr className="white dark:bg-gray-900/50 hover:bg-gray-100/50 dark:hover:bg-gray-900" key={d.id}>
-                                {/* <td className="w-4 p-4">
-                                        <div className="flex items-center">
-                                            <input id="checkbox-table-search-1" type="checkbox" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-                                            <label htmlFor="checkbox-table-search-1" className="sr-only">checkbox</label>
-                                        </div>
-                                    </td> */}
                                 <td scope="row" className="px-6 py-4 border border-slate-300 dark:border-slate-700 p-4 text-slate-500 dark:text-white">
-                                    {d.first_name + ' ' + d.last_name}
+                                    {d.firstName + ' ' + d.lastName}
                                 </td>
                                 <td scope="row" className="px-6 py-4 border border-slate-300 dark:border-slate-700 p-4 text-slate-500 dark:text-white">
                                     {d.email}
                                 </td>
                                 <td scope="row" className="px-6 py-4 border border-slate-300 dark:border-slate-700 p-4 text-slate-500 dark:text-white">
-                                    {d.role}
-                                </td>
-                                <td scope="row" className="px-6 py-4 border border-slate-300 dark:border-slate-700 p-4 text-slate-500 dark:text-white">
-                                    {d.phone_no}
+                                    {d?.role?.name}
                                 </td>
                                 <ButtonAction key={d.id} editData={() => onEditHandler(d)} deleteData={() => onDeleteHandler(d)} />
                             </tr>
-                        ))
-                        }
+                        ))}
                     </tbody>
                 </Table>
-                <Pagination
+                {/* <Pagination
                     {...pageProps}
                     onNextClick={() => getData({ page: +pageProps?.page + 1, search })}
                     onPrevClick={() => getData({ page: +pageProps?.page - 1, search })}
-                />
+                /> */}
             </div>
             <Modal
                 open={openModal}
@@ -381,7 +339,7 @@ export default function Users() {
                 deleteItem={deleteData!}
             >
                 <p className="text-gray-500 dark:text-gray-300 text-lg">Are you sure you want to delete this item?</p>
-                <p className="mb-4 text-gray-500 dark:text-gray-300 text-lg">({selectedData?.first_name + ' ' + selectedData?.last_name})</p>
+                <p className="mb-4 text-gray-500 dark:text-gray-300 text-lg">({selectedData?.firstName + ' ' + selectedData?.lastName})</p>
             </DeleteModal>
         </div>
     )

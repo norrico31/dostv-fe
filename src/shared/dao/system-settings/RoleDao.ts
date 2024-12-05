@@ -1,32 +1,15 @@
-import { transformBeToFe } from "../../utils/transformer";
-import { urlParams } from "../../utils/url-params";
+import { BASE_URL } from "../../config";
 
 export const roleDao = () => {
-    const getRoles = async ({ signal, ...restParams }: ApiParams): Promise<DaoFE<Role[]>> => {
-        const res = await fetch<DaoBE<Role[]>>(urlParams(`/roles`, { ...restParams }), { signal })
-        return transformBeToFe<Role[]>(res)
-    }
+    const getRoles = ({ signal, ...restParams }: ApiParams) => fetch(`${BASE_URL}/roles`, { ...restParams, signal })
 
-    const getRole = async (id: string) => {
-        const { data } = await fetch<RoleDao>(urlParams(`/roles/${id}`))
-        return data
-    }
+    const getRole = (id: string) => fetch(`${BASE_URL}/roles/${id}`)
 
-    const postRole = async (payload: { name: string; description: string }) => {
-        const { data } = await fetch<RoleDao>(urlParams(`/roles/`), { method: 'POST', body: JSON.stringify(payload) })
-        return data
-    }
+    const postRole = (payload: { name: string; description: string }) => fetch(`${BASE_URL}/roles`, { method: "POST", body: JSON.stringify(payload) })
 
-    const putRole = async ({ id, ...restPayload }: { id: string; name: string; description: string }) => {
-        const { data } = await fetch<RoleDao>(urlParams(`/roles/` + id), { method: 'PUT', body: JSON.stringify(restPayload) })
-        return data
-    }
+    const putRole = ({ id, ...restPayload }: { id: string; name: string; description: string }) => fetch(`${BASE_URL}/roles/${id}`, { method: "PUT", body: JSON.stringify(restPayload) })
 
-    const deleteRole = async (id: string) => {
-        const { data } = await fetch<RoleDao>(urlParams(`/roles/` + id), { method: 'DELETE' })
-        return data
-    }
-
+    const deleteRole = (id: string) => fetch(`${BASE_URL}/roles/${id}`, { method: "DELETE" })
     return {
         getRoles,
         getRole,

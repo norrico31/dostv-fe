@@ -108,7 +108,7 @@ const initState: DaoFE<Role[]> = {
 
 export default function Roles() {
     const [loading, setLoading] = useState(true)
-    const [{ data, ...pageProps }, setData] = useState<DaoFE<Role[]>>(initState)
+    const [data, setData] = useState<DaoFE<Role[]>>(initState)
     const [search, inputValue, onChange] = useSearchDebounce()
     const [openModal, setOpenModal] = useState(false)
     const [selectedData, setSelectedData] = useState<Role | undefined>(undefined)
@@ -117,7 +117,7 @@ export default function Roles() {
     useEffect(() => {
         const controller = new AbortController();
         let flag = false;
-        !flag && getData({ signal: controller.signal, search })
+        if (!flag) getData({ signal: controller.signal, search })
         return function () {
             controller.abort()
             flag = true
@@ -128,7 +128,8 @@ export default function Roles() {
         setLoading(true)
         try {
             const res = await getRoles({ signal: args?.signal, search: args?.search, page: args?.page });
-            setData(res)
+            const data = await res.json()
+            setData(data.data)
         } catch (error) {
             console.log('error: ', error)
             return error
@@ -173,12 +174,6 @@ export default function Roles() {
                 <Table>
                     <thead className="text-md text-gray-800 uppercase bg-gray-200 dark:bg-gray-700 dark:text-gray-100">
                         <tr>
-                            {/* <th scope="col" className="p-4">
-                                <div className="flex items-center">
-                                    <input id="checkbox-all-search" type="checkbox" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-                                    <label htmlFor="checkbox-all-search" className="sr-only">checkbox</label>
-                                </div>
-                            </th> */}
                             <th scope="col" className="px-6 py-3">
                                 Name
                             </th>
@@ -193,12 +188,6 @@ export default function Roles() {
                     <tbody>
                         {loading ? <tr><td className='w-full h-full'><Loading /></td></tr> : !data.length ? <tr className='text-center'><td className='w-full h-full'>No data record </td></tr> : (data ?? []).map((d) => (
                             <tr className="white dark:bg-gray-900/50 hover:bg-gray-100/50 dark:hover:bg-gray-900" key={d.id}>
-                                {/* <td className="w-4 p-4">
-                                        <div className="flex items-center">
-                                            <input id="checkbox-table-search-1" type="checkbox" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-                                            <label htmlFor="checkbox-table-search-1" className="sr-only">checkbox</label>
-                                        </div>
-                                    </td> */}
                                 <td scope="row" className="px-6 py-4 border border-slate-300 dark:border-slate-700 p-4 text-slate-500 dark:text-white">
                                     {d.name}
                                 </td>
@@ -211,11 +200,11 @@ export default function Roles() {
                         }
                     </tbody>
                 </Table>
-                <Pagination
+                {/* <Pagination
                     {...pageProps}
                     onNextClick={() => getData({ page: +pageProps?.page + 1, search })}
                     onPrevClick={() => getData({ page: +pageProps?.page - 1, search })}
-                />
+                /> */}
             </div>
             <Modal
                 open={openModal}

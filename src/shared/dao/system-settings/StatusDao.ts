@@ -1,31 +1,19 @@
-import { transformBeToFe } from "../../utils/transformer";
-import { urlParams } from "../../utils/url-params";
+import { BASE_URL } from "../../config";
 
 export const statusDao = () => {
-    const getStatuses = async ({ signal, ...restParams }: ApiParams): Promise<DaoFE<Status[]>> => {
-        const res = await fetch<DaoBE<Status[]>>(urlParams(`/statuses`, { ...restParams }), { signal })
-        return transformBeToFe<Status[]>(res)
+    const getStatuses = ({ signal }: ApiParams) => fetch(`${BASE_URL}/statuses`, { signal })
+
+    const getStatus = (id: string) => fetch(`${BASE_URL}/statuses/${id}`)
+
+    const postStatus = (payload: { name: string; description: string }) => {
+
+        console.log('poststatus')
+        return fetch(`${BASE_URL}/statuses`, { method: 'POST', body: JSON.stringify(payload) })
     }
 
-    const getStatus = async (id: string) => {
-        const { data } = await fetch<StatusDao>(urlParams(`/statuses/${id}`))
-        return data
-    }
+    const putStatus = ({ id, ...restPayload }: { id: string; name: string; description: string }) => fetch(`${BASE_URL}/statuses/${id}`, { method: 'PUT', body: JSON.stringify(restPayload) })
 
-    const postStatus = async (payload: { name: string; description: string }) => {
-        const { data } = await fetch<StatusDao>(urlParams(`/statuses/`), { method: 'POST', body: JSON.stringify(payload) })
-        return data
-    }
-
-    const putStatus = async ({ id, ...restPayload }: { id: string; name: string; description: string }) => {
-        const { data } = await fetch<StatusDao>(urlParams(`/statuses/` + id), { method: 'PUT', body: JSON.stringify(restPayload) })
-        return data
-    }
-
-    const deleteStatus = async (id: string) => {
-        const { data } = await fetch<StatusDao>(urlParams(`/statuses/` + id), { method: 'DELETE' })
-        return data
-    }
+    const deleteStatus = (id: string) => fetch(`${BASE_URL}/statuses/` + id, { method: 'DELETE' })
 
     return {
         getStatuses,

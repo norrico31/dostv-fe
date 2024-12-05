@@ -7,6 +7,7 @@ export * from './system-settings/RoleDao';
 export * from './system-settings/ScheduleDao';
 export * from './system-settings/SeverityTypeDao';
 export * from './system-settings/StatusDao';
+export * from './system-settings/PriorityDao';
 export * from './projects/BacklogDao';
 export * from './projects/SprintsDao';
 export * from './projects/ReportDao';
